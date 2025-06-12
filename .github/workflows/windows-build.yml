@@ -1,0 +1,39 @@
+name: Build Windows x64 EXE
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      # 1. Checkout 仓库
+      - uses: actions/checkout@v3
+
+      # 2. 安装 Python 3.11
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      # 3. 安装 PyInstaller
+      - name: Install PyInstaller
+        run: pip install pyinstaller
+
+      # 4. 打包 EXE（--icon 指向 myapp.ico）
+      - name: Build EXE
+        run: |
+          pyinstaller \
+            --onefile \
+            --windowed \
+            --icon=myapp.ico \
+            asset_gui.py
+
+      # 5. 上传产物
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: asset_gui-windows-x64
+          path: dist/asset_gui.exe
