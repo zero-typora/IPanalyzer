@@ -9,8 +9,11 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      # 1. Checkout 仓库
-      - uses: actions/checkout@v3
+      # 1. 拉取完整 Git 历史，确保 myapp.ico 在 runner 上可见
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       # 2. 安装 Python 3.11
       - name: Set up Python
@@ -22,8 +25,8 @@ jobs:
       - name: Install PyInstaller
         run: pip install pyinstaller
 
-      # 4. 打包 EXE（--icon 指向 myapp.ico）
-      - name: Build EXE
+      # 4. 用 PyInstaller 打包 EXE，指定图标
+      - name: Build EXE with icon
         run: |
           pyinstaller \
             --onefile \
@@ -31,9 +34,9 @@ jobs:
             --icon=myapp.ico \
             asset_gui.py
 
-      # 5. 上传产物
+      # 5. 上传打包产物（使用 upload-artifact v4）
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: asset_gui-windows-x64
           path: dist/asset_gui.exe
